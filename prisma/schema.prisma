@@ -24,23 +24,24 @@ model Article {
 }
 
 model ExcFile {
-  id            Int       @id @default(autoincrement())
-  subida        DateTime?
-  actualiza     DateTime?
-  cuit          String?
-  razsoc        String?
-  domicilio     String?
-  localidad     String?
-  cuitPres      String?
-  razsocPre     String?
-  caracter      String?
-  tipoCont      String?
-  fecConfir     DateTime?
-  horaConfi     String?
-  email         String?
-  montoAdeudado Float?
-  emailEnviado  Boolean?
-  fechaEnvio    DateTime?
-  archivoRuta   String?
-  procesado     Boolean?  @default(false)
+  cuit           String 
+  nroSubida      Int     
+  subida         DateTime?  
+  actualiza      DateTime?
+  razsoc         String?
+  domicilio      String?
+  localidad      String?
+  cuitPres       String?
+  razsocPre      String?
+  caracter       String?
+  tipoCont       String?
+  fecConfir      DateTime?
+  horaConfi      String?
+  email          String?
+  montoAdeudado  Float?
+  emailEnviado   Boolean?
+  fechaEnvio     DateTime?
+  procesado      Boolean?   @default(false)
+
+  @@id([cuit, nroSubida])
 }
