@@ -13,28 +13,33 @@ import { FilterExcFileDto } from './dto/filter-exc-file.dto';
 export class ExcFilesController {
   constructor(private readonly excFilesService: ExcFilesService) { }
 
-@Get()
-findAll(@Query() query: FilterExcFileDto) {
-  const parsed = {
-    skip: query.skip ? parseInt(query.skip) : 0,
-    take: query.take ? parseInt(query.take) : 100,
-    localidad: query.localidad || undefined,
-    emailEnviado:
-      query.emailEnviado === 'true'
-        ? true
-        : query.emailEnviado === 'false'
-        ? false
-        : undefined,
-    caracter: query.caracter || undefined,
-    tipoCont: query.tipoCont || undefined,
-    montoAdeudadoDesde: query.montoAdeudadoDesde ? parseFloat(query.montoAdeudadoDesde) : undefined,
-    montoAdeudadoHasta: query.montoAdeudadoHasta ? parseFloat(query.montoAdeudadoHasta) : undefined,
-    fecConfirDesde: query.fecConfirDesde || undefined,
-    fecConfirHasta: query.fecConfirHasta || undefined,
-  };
+  @Get()
+  findAll(@Query() query: any) {
+    const parsed = {
+      skip: query.skip ? parseInt(query.skip) : 0,
+      take: query.take ? parseInt(query.take) : 100,
+      localidad: query.localidad || undefined,
+      emailEnviado: query.emailEnviado === 'true' ? true :
+        query.emailEnviado === 'false' ? false : undefined,
+      caracter: Array.isArray(query.caracter)
+        ? query.caracter
+        : query.caracter
+          ? [query.caracter]
+          : undefined,
+      tipoCont: Array.isArray(query.tipoCont)
+        ? query.tipoCont
+        : query.tipoCont
+          ? [query.tipoCont]
+          : undefined,
+      montoAdeudadoDesde: query.montoAdeudadoDesde ? parseFloat(query.montoAdeudadoDesde) : undefined,
+      montoAdeudadoHasta: query.montoAdeudadoHasta ? parseFloat(query.montoAdeudadoHasta) : undefined,
+      fecConfirDesde: query.fecConfirDesde || undefined,
+      fecConfirHasta: query.fecConfirHasta || undefined,
+    };
 
-  return this.excFilesService.findAll(parsed);
-}
+    return this.excFilesService.findAll(parsed);
+  }
+
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {

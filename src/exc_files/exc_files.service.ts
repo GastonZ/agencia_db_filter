@@ -5,15 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ExcFilesService {
   private readonly logger = new Logger(ExcFilesService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAll(params: {
     skip?: number;
     take?: number;
     localidad?: string;
     emailEnviado?: boolean;
-    caracter?: string;
-    tipoCont?: string;
+    caracter?: string | string[];
+    tipoCont?: string | string[];
     montoAdeudadoDesde?: number;
     montoAdeudadoHasta?: number;
     fecConfirDesde?: string;
@@ -36,22 +36,35 @@ export class ExcFilesService {
       localidad: localidad
         ? { contains: localidad, mode: 'insensitive' as const }
         : undefined,
+
       emailEnviado: emailEnviado !== undefined ? emailEnviado : undefined,
-      caracter: caracter ? { equals: caracter } : undefined,
-      tipoCont: tipoCont ? { equals: tipoCont } : undefined,
+
+      caracter: caracter
+        ? Array.isArray(caracter)
+          ? { in: caracter }
+          : { equals: caracter }
+        : undefined,
+
+      tipoCont: tipoCont
+        ? Array.isArray(tipoCont)
+          ? { in: tipoCont }
+          : { equals: tipoCont }
+        : undefined,
+
       montoAdeudado:
         montoAdeudadoDesde || montoAdeudadoHasta
           ? {
-              gte: montoAdeudadoDesde,
-              lte: montoAdeudadoHasta,
-            }
+            gte: montoAdeudadoDesde,
+            lte: montoAdeudadoHasta,
+          }
           : undefined,
+
       fecConfir:
         fecConfirDesde || fecConfirHasta
           ? {
-              gte: fecConfirDesde ? new Date(fecConfirDesde) : undefined,
-              lte: fecConfirHasta ? new Date(fecConfirHasta) : undefined,
-            }
+            gte: fecConfirDesde ? new Date(fecConfirDesde) : undefined,
+            lte: fecConfirHasta ? new Date(fecConfirHasta) : undefined,
+          }
           : undefined,
     };
 
