@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumberString } from 'class-validator'
+import { IsOptional, IsString, IsNumberString, IsArray } from 'class-validator'
 
 export class FilterExcFileDto {
   @IsOptional()
@@ -14,10 +14,14 @@ export class FilterExcFileDto {
   emailEnviado?: string;
 
   @IsOptional()
-  caracter?: string;
+  @IsArray()
+  @IsString({ each: true })
+  caracter?: string[];
 
   @IsOptional()
-  tipoCont?: string;
+  @IsArray()
+  @IsString({ each: true })
+  tipoCont?: string[];
 
   @IsOptional()
   montoAdeudadoDesde?: string;
