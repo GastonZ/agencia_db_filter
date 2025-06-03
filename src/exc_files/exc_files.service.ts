@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ExcFilesService {
+  private readonly logger = new Logger(ExcFilesService.name);
+
   constructor(private prisma: PrismaService) {}
 
   async findAll(params: {
@@ -53,6 +55,9 @@ export class ExcFilesService {
           : undefined,
     };
 
+    this.logger.debug(`Parámetros recibidos: ${JSON.stringify(params, null, 2)}`);
+    this.logger.debug(`Objeto 'where' para Prisma: ${JSON.stringify(where, null, 2)}`);
+
     const [data, total, filterValues] = await this.prisma.$transaction([
       this.prisma.excFile.findMany({
         skip,
@@ -71,6 +76,9 @@ export class ExcFilesService {
         where: {},
       }),
     ]);
+
+    this.logger.debug(`Total resultados: ${total}`);
+    this.logger.debug(`Primeros resultados: ${JSON.stringify(data.slice(0, 5), null, 2)}`);
 
     const filters = {
       caracter: [...new Set(filterValues.map((f) => f.caracter).filter(Boolean))],
