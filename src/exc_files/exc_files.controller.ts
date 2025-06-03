@@ -5,6 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
+import { FilterExcFileDto } from './dto/filter-exc-file.dto';
 
 
 @ApiTags('ExcFiles')
@@ -12,24 +13,28 @@ import * as fs from 'fs';
 export class ExcFilesController {
   constructor(private readonly excFilesService: ExcFilesService) { }
 
-  @Get()
-  @ApiQuery({ name: 'skip', required: false, example: 0 })
-  @ApiQuery({ name: 'take', required: false, example: 100 })
-  @ApiQuery({ name: 'localidad', required: false, example: 'Rosario' })
-  @ApiQuery({ name: 'emailEnviado', required: false, type: Boolean })
-  findAll(
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
-    @Query('localidad') localidad?: string,
-    @Query('emailEnviado') emailEnviado?: string,
-  ) {
-    return this.excFilesService.findAll({
-      skip: skip ? parseInt(skip) : 0,
-      take: take ? parseInt(take) : 100,
-      localidad,
-      emailEnviado: emailEnviado === 'true' ? true : emailEnviado === 'false' ? false : undefined,
-    });
-  }
+@Get()
+findAll(@Query() query: FilterExcFileDto) {
+  const parsed = {
+    skip: query.skip ? parseInt(query.skip) : 0,
+    take: query.take ? parseInt(query.take) : 100,
+    localidad: query.localidad || undefined,
+    emailEnviado:
+      query.emailEnviado === 'true'
+        ? true
+        : query.emailEnviado === 'false'
+        ? false
+        : undefined,
+    caracter: query.caracter || undefined,
+    tipoCont: query.tipoCont || undefined,
+    montoAdeudadoDesde: query.montoAdeudadoDesde ? parseFloat(query.montoAdeudadoDesde) : undefined,
+    montoAdeudadoHasta: query.montoAdeudadoHasta ? parseFloat(query.montoAdeudadoHasta) : undefined,
+    fecConfirDesde: query.fecConfirDesde || undefined,
+    fecConfirHasta: query.fecConfirHasta || undefined,
+  };
+
+  return this.excFilesService.findAll(parsed);
+}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
